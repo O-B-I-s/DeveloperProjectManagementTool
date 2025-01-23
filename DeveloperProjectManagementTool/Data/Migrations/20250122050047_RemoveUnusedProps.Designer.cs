@@ -4,6 +4,7 @@ using DeveloperProjectManagementTool.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeveloperProjectManagementTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250122050047_RemoveUnusedProps")]
+    partial class RemoveUnusedProps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,15 +42,14 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectId")
+                    b.Property<int>("Priority")
                         .HasColumnType("int");
 
                     b.Property<string>("ReporterId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("SprintId")
@@ -64,8 +66,6 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
 
                     b.HasIndex("ReporterId");
 
@@ -118,15 +118,10 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProjectId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectHistories");
                 });
@@ -149,9 +144,6 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -159,8 +151,6 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
 
                     b.ToTable("Sprints");
                 });
@@ -177,6 +167,9 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("IssueId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -186,37 +179,9 @@ namespace DeveloperProjectManagementTool.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SubTasks");
-                });
-
-            modelBuilder.Entity("DeveloperProjectManagementTool.Models.Task", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IssueId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
                     b.HasIndex("IssueId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("SubTasks");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -423,21 +388,15 @@ namespace DeveloperProjectManagementTool.Data.Migrations
 
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Issue", b =>
                 {
-                    b.HasOne("DeveloperProjectManagementTool.Models.Project", "Project")
-                        .WithMany("Issues")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Reporter")
                         .WithMany()
-                        .HasForeignKey("ReporterId");
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DeveloperProjectManagementTool.Models.Sprint", null)
                         .WithMany("Issues")
                         .HasForeignKey("SprintId");
-
-                    b.Navigation("Project");
 
                     b.Navigation("Reporter");
                 });
@@ -453,33 +412,11 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("DeveloperProjectManagementTool.Models.ProjectHistory", b =>
+            modelBuilder.Entity("DeveloperProjectManagementTool.Models.SubTask", b =>
                 {
-                    b.HasOne("DeveloperProjectManagementTool.Models.Project", null)
-                        .WithMany("History")
-                        .HasForeignKey("ProjectId");
-                });
-
-            modelBuilder.Entity("DeveloperProjectManagementTool.Models.Sprint", b =>
-                {
-                    b.HasOne("DeveloperProjectManagementTool.Models.Project", "Project")
-                        .WithMany("Sprints")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("DeveloperProjectManagementTool.Models.Task", b =>
-                {
-                    b.HasOne("DeveloperProjectManagementTool.Models.Issue", "Issue")
-                        .WithMany("Tasks")
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Issue");
+                    b.HasOne("DeveloperProjectManagementTool.Models.Issue", null)
+                        .WithMany("SubTasks")
+                        .HasForeignKey("IssueId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -535,16 +472,7 @@ namespace DeveloperProjectManagementTool.Data.Migrations
 
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Issue", b =>
                 {
-                    b.Navigation("Tasks");
-                });
-
-            modelBuilder.Entity("DeveloperProjectManagementTool.Models.Project", b =>
-                {
-                    b.Navigation("History");
-
-                    b.Navigation("Issues");
-
-                    b.Navigation("Sprints");
+                    b.Navigation("SubTasks");
                 });
 
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Sprint", b =>

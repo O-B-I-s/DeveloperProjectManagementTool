@@ -45,7 +45,7 @@ namespace DeveloperProjectManagementTool.Controllers
         public IActionResult Create()
         {
             // Populate the dropdown with user names
-            ViewData["OwnerName"] = new SelectList(_context.Users, "UserName", "UserName");
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName");
             return View();
         }
 
@@ -54,31 +54,30 @@ namespace DeveloperProjectManagementTool.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,OwnerId")] Project project, string OwnerName)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,OwnerId")] Project project)
         {
-            if (ModelState.IsValid)
-            {
-                // Retrieve the user by name
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == OwnerName);
-                if (user == null)
-                {
-                    ModelState.AddModelError("OwnerId", "The selected owner does not exist.");
-                    ViewData["OwnerName"] = new SelectList(_context.Users, "UserName", "UserName", OwnerName);
-                    return View(project);
-                }
+            //if (ModelState.IsValid)
+            //{
+            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == project.OwnerId);
+            //if (user == null)
+            //{
+            //    ModelState.AddModelError("OwnerId", "The selected owner does not exist.");
+            //    ViewBag.OwnerId = new SelectList(_context.Users, "Id", "UserName", project.OwnerId);
+            //    return View(project);
+            //}
 
-                // Set the OwnerId
-                project.OwnerId = user.Id;
+            // No need to assign project.Owner, just set the OwnerId
+            _context.Add(project);
+            await _context.SaveChangesAsync();
+            ViewBag.OwnerId = new SelectList(_context.Users, "Id", "UserName", project.OwnerId);
+            return RedirectToAction(nameof(Index));
+            // }
 
-                // Add and save the project
-                _context.Add(project);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
 
-            ViewData["OwnerName"] = new SelectList(_context.Users, "UserName", "UserName", OwnerName);
-            return View(project);
+
+            //return View(project);
         }
+
 
         // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -93,7 +92,7 @@ namespace DeveloperProjectManagementTool.Controllers
             {
                 return NotFound();
             }
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.OwnerId);
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.Owner);
             return View(project);
         }
 
@@ -109,28 +108,29 @@ namespace DeveloperProjectManagementTool.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
+            //{
+            try
             {
-                try
-                {
-                    _context.Update(project);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProjectExists(project.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(project);
+                await _context.SaveChangesAsync();
             }
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.OwnerId);
-            return View(project);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProjectExists(project.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.Owner);
+            return RedirectToAction(nameof(Index));
+            //}
+
+            //return View(project);
         }
 
         // GET: Projects/Delete/5

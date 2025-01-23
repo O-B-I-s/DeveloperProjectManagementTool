@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DeveloperProjectManagementTool.Models
 {
@@ -12,6 +13,10 @@ namespace DeveloperProjectManagementTool.Models
         [Required]
         public SprintStatus Status { get; set; } = SprintStatus.NotStarted;
         public List<Issue> Issues { get; set; } = new();
+        [Required]
+        public int ProjectId { get; set; }
+        [ForeignKey("ProjectId")]
+        public Project Project { get; set; }
 
         public void CalculateEndDate()
         {

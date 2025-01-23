@@ -3,7 +3,9 @@
 @{
     ViewData["Title"] = "Details";
 }
-
+<a asp-action="Create" asp-controller="Tasks" asp-route-IssueId="@Model.Id" class="btn btn-primary">
+    Create A Task
+</a>
 <h1>Details</h1>
 
 <div>

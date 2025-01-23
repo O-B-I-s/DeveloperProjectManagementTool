@@ -18,7 +18,8 @@ namespace DeveloperProjectManagementTool.Controllers
         // GET: Issues
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Issues.Include(i => i.Reporter);
+            var applicationDbContext = _context.Issues.Include(i => i.Reporter)
+                                                      .Include(p => p.Project);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -32,6 +33,7 @@ namespace DeveloperProjectManagementTool.Controllers
 
             var issue = await _context.Issues
                 .Include(i => i.Reporter)
+                .Include(p => p.Project)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (issue == null)
             {
@@ -42,8 +44,9 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
         // GET: Issues/Create
-        public IActionResult Create()
+        public IActionResult Create(int projectId)
         {
+            ViewData["ProjectId"] = projectId; // Pass project ID to the view
             ViewData["Status"] = new SelectList(Enum.GetValues(typeof(IssueStatus)).Cast<IssueStatus>());
             ViewData["Type"] = new SelectList(Enum.GetValues(typeof(IssueType)).Cast<IssueType>());
             ViewData["Priority"] = new SelectList(Enum.GetValues(typeof(PriorityLevel)).Cast<PriorityLevel>());
@@ -56,19 +59,21 @@ namespace DeveloperProjectManagementTool.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Summary,Description,Attachment,ReporterId,Priority,Type,Status")] Issue issue)
+        public async Task<IActionResult> Create([Bind("Id,Name,Summary,Description,Attachment,ReporterId,Priority,Type,Status,ProjectId")] Issue issue)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(issue);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            //if (ModelState.IsValid)
+            //{
+            _context.Add(issue);
+            await _context.SaveChangesAsync();
+            ViewData["ProjectId"] = issue.ProjectId;
             ViewData["ReporterId"] = new SelectList(_context.Users, "Id", "Id", issue.ReporterId);
             ViewData["Status"] = new SelectList(Enum.GetValues(typeof(IssueStatus)).Cast<IssueStatus>());
             ViewData["Type"] = new SelectList(Enum.GetValues(typeof(IssueType)).Cast<IssueType>());
             ViewData["Priority"] = new SelectList(Enum.GetValues(typeof(PriorityLevel)).Cast<PriorityLevel>());
-            return View(issue);
+            return RedirectToAction("Details", "Projects", new { id = issue.ProjectId });
+            //}
+
+            //return View(issue);
         }
 
         // GET: Issues/Edit/5
