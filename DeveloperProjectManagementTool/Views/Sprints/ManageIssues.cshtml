@@ -1,0 +1,34 @@
+﻿@model DeveloperProjectManagementTool.Models.SprintIssuesViewModel
+
+<h2>Manage Issues for Sprint: @Model.SprintName</h2>
+
+<form asp-action="ManageIssues" method="post">
+    <input type="hidden" asp-for="SprintId" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Issue Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var issue in Model.AvailableIssues)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox"
+                               name="SelectedIssueIds"
+                               value="@issue.Id"
+                        @(Model.SelectedIssueIds.Contains(issue.Id) ? "checked" : "") />
+                    </td>
+                    <td>@issue.Name</td>
+                    <td>@issue.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>

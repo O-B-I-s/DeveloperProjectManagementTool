@@ -4,6 +4,7 @@ using DeveloperProjectManagementTool.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeveloperProjectManagementTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250123051522_Subtasks")]
+    partial class Subtasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -439,15 +442,13 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .WithMany()
                         .HasForeignKey("ReporterId");
 
-                    b.HasOne("DeveloperProjectManagementTool.Models.Sprint", "Sprint")
+                    b.HasOne("DeveloperProjectManagementTool.Models.Sprint", null)
                         .WithMany("Issues")
                         .HasForeignKey("SprintId");
 
                     b.Navigation("Project");
 
                     b.Navigation("Reporter");
-
-                    b.Navigation("Sprint");
                 });
 
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Project", b =>

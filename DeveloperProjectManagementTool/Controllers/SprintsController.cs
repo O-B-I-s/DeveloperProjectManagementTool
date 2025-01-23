@@ -40,8 +40,12 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
         // GET: Sprints/Create
-        public IActionResult Create()
+        public IActionResult Create(int projectId)
         {
+            var projects = new Project
+            {
+                Id = projectId,
+            };
             ViewBag.Status = new SelectList(Enum.GetValues(typeof(SprintStatus))
            .Cast<SprintStatus>()
            .Select(s => new SelectListItem
@@ -57,14 +61,14 @@ namespace DeveloperProjectManagementTool.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,StartDate,EndDate,DurationInDays,Status")] Sprint sprint)
+        public async Task<IActionResult> Create([Bind("Id,Name,StartDate,EndDate,DurationInDays,Status,ProjectId")] Sprint sprint)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(sprint);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            //if (ModelState.IsValid)
+            //{
+            _context.Add(sprint);
+            await _context.SaveChangesAsync();
+
+            //}
             ViewBag.Status = new SelectList(Enum.GetValues(typeof(SprintStatus))
             .Cast<SprintStatus>()
             .Select(s => new SelectListItem
@@ -72,7 +76,8 @@ namespace DeveloperProjectManagementTool.Controllers
                 Value = s.ToString(),
                 Text = s.ToString()
             }), "Value", "Text");
-            return View(sprint);
+            return RedirectToAction(nameof(Index));
+            //return View(sprint);
         }
 
         // GET: Sprints/Edit/5
@@ -158,6 +163,70 @@ namespace DeveloperProjectManagementTool.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
+        public async Task<IActionResult> ManageIssues(int sprintId)
+        {
+            var sprint = await _context.Sprints
+                .Include(s => s.Issues) // Include related issues
+                .FirstOrDefaultAsync(s => s.Id == sprintId);
+
+            if (sprint == null)
+            {
+                return NotFound();
+            }
+
+            var availableIssues = await _context.Issues
+                .Where(i => i.SprintId == null) // Only show unassigned issues
+                .ToListAsync();
+
+            var viewModel = new SprintIssuesViewModel
+            {
+                SprintId = sprint.Id,
+                SprintName = sprint.Name,
+                AvailableIssues = availableIssues,
+                SelectedIssueIds = sprint.Issues.Select(i => i.Id).ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ManageIssues(SprintIssuesViewModel model)
+        {
+            var sprint = await _context.Sprints
+                .Include(s => s.Issues)
+                .FirstOrDefaultAsync(s => s.Id == model.SprintId);
+
+            if (sprint == null)
+            {
+                return NotFound();
+            }
+
+            // Remove issues not selected
+            foreach (var issue in sprint.Issues.ToList())
+            {
+                if (!model.SelectedIssueIds.Contains(issue.Id))
+                {
+                    issue.SprintId = null; // Unassign the sprint
+                }
+            }
+
+            // Add selected issues
+            foreach (var issueId in model.SelectedIssueIds)
+            {
+                var issue = await _context.Issues.FindAsync(issueId);
+                if (issue != null && issue.SprintId != sprint.Id)
+                {
+                    issue.SprintId = sprint.Id; // Assign the sprint
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = sprint.Id });
+        }
+
 
         private bool SprintExists(int id)
         {

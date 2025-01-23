@@ -1,27 +1,28 @@
 ﻿using DeveloperProjectManagementTool.Data;
+using DeveloperProjectManagementTool.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeveloperProjectManagementTool.Controllers
 {
-    public class TasksController : Controller
+    public class SubTasksController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public TasksController(ApplicationDbContext context)
+        public SubTasksController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Tasks
+        // GET: SubTasks
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Tasks.Include(t => t.Issue);
+            var applicationDbContext = _context.SubTasks.Include(s => s.Issue);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Tasks/Details/5
+        // GET: SubTasks/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -29,44 +30,47 @@ namespace DeveloperProjectManagementTool.Controllers
                 return NotFound();
             }
 
-            var task = await _context.Tasks
-                .Include(t => t.Issue)
+            var subTask = await _context.SubTasks
+                .Include(s => s.Issue)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (task == null)
+            if (subTask == null)
             {
                 return NotFound();
             }
 
-            return View(task);
+            return View(subTask);
         }
 
-        // GET: Tasks/Create
+        // GET: SubTasks/Create
         public IActionResult Create(int issueId)
         {
-
-            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id");
+            var subTask = new SubTask
+            {
+                IssueId = issueId
+            };
+            //ViewData["IssueId"] = _context.Issues.FirstOrDefault(i => i.Id == issueId);
             return View();
         }
 
-        // POST: Tasks/Create
+        // POST: SubTasks/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,IsCompleted,IssueId")] Models.Task task)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,IsCompleted,IssueId")] SubTask subTask)
         {
             //if (ModelState.IsValid)
             //{
-            _context.Add(task);
+            _context.Add(subTask);
             await _context.SaveChangesAsync();
-            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", task.IssueId);
+            //ViewData["IssueId"] = subTask.IssueId;
             return RedirectToAction(nameof(Index));
             //}
-
-            //return View(task);
+            //ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", subTask.IssueId);
+            //return View(subTask);
         }
 
-        // GET: Tasks/Edit/5
+        // GET: SubTasks/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,23 +78,23 @@ namespace DeveloperProjectManagementTool.Controllers
                 return NotFound();
             }
 
-            var task = await _context.Tasks.FindAsync(id);
-            if (task == null)
+            var subTask = await _context.SubTasks.FindAsync(id);
+            if (subTask == null)
             {
                 return NotFound();
             }
-            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", task.IssueId);
-            return View(task);
+            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", subTask.IssueId);
+            return View(subTask);
         }
 
-        // POST: Tasks/Edit/5
+        // POST: SubTasks/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsCompleted,IssueId")] Models.Task task)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsCompleted,IssueId")] SubTask subTask)
         {
-            if (id != task.Id)
+            if (id != subTask.Id)
             {
                 return NotFound();
             }
@@ -99,12 +103,12 @@ namespace DeveloperProjectManagementTool.Controllers
             {
                 try
                 {
-                    _context.Update(task);
+                    _context.Update(subTask);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TaskExists(task.Id))
+                    if (!SubTaskExists(subTask.Id))
                     {
                         return NotFound();
                     }
@@ -115,11 +119,11 @@ namespace DeveloperProjectManagementTool.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", task.IssueId);
-            return View(task);
+            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", subTask.IssueId);
+            return View(subTask);
         }
 
-        // GET: Tasks/Delete/5
+        // GET: SubTasks/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -127,35 +131,35 @@ namespace DeveloperProjectManagementTool.Controllers
                 return NotFound();
             }
 
-            var task = await _context.Tasks
-                .Include(t => t.Issue)
+            var subTask = await _context.SubTasks
+                .Include(s => s.Issue)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (task == null)
+            if (subTask == null)
             {
                 return NotFound();
             }
 
-            return View(task);
+            return View(subTask);
         }
 
-        // POST: Tasks/Delete/5
+        // POST: SubTasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var task = await _context.Tasks.FindAsync(id);
-            if (task != null)
+            var subTask = await _context.SubTasks.FindAsync(id);
+            if (subTask != null)
             {
-                _context.Tasks.Remove(task);
+                _context.SubTasks.Remove(subTask);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TaskExists(int id)
+        private bool SubTaskExists(int id)
         {
-            return _context.Tasks.Any(e => e.Id == id);
+            return _context.SubTasks.Any(e => e.Id == id);
         }
     }
 }

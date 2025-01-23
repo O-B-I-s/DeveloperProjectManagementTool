@@ -1,27 +1,20 @@
-﻿@model DeveloperProjectManagementTool.Models.Project
+﻿@model DeveloperProjectManagementTool.Models.SubTask
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<a asp-action="Create" asp-controller="Issues" asp-route-projectId="@Model.Id" class="btn btn-primary">
-    Add Issue
-</a>
-<br />
-<a asp-action="Create" asp-controller="Sprints" asp-route-projectId="@Model.Id" class="btn btn-primary">
-    Add Issue
-</a>
 <h1>Details</h1>
 
 <div>
-    <h4>Project</h4>
+    <h4>SubTask</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Title)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Title)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
@@ -30,10 +23,16 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Owner)
+            @Html.DisplayNameFor(model => model.IsCompleted)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Owner.Id)
+            @Html.DisplayFor(model => model.IsCompleted)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Issue)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Issue.Id)
         </dd>
     </dl>
 </div>
