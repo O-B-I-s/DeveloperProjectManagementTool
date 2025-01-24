@@ -18,7 +18,7 @@ namespace DeveloperProjectManagementTool.Controllers
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Projects.Include(p => p.Owner);
+            var applicationDbContext = _context.Projects.Include(p => p.Owner).Include(s => s.Sprints);
             return View(await applicationDbContext.ToListAsync());
         }
 

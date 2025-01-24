@@ -16,10 +16,14 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
         // GET: SubTasks
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id)
         {
-            var applicationDbContext = _context.SubTasks.Include(s => s.Issue);
-            return View(await applicationDbContext.ToListAsync());
+            var tasks = await _context.SubTasks
+                 .Where(t => t.IssueId == id)
+                 .ToListAsync();
+
+
+            return View(tasks);
         }
 
         // GET: SubTasks/Details/5
@@ -48,6 +52,7 @@ namespace DeveloperProjectManagementTool.Controllers
             {
                 IssueId = issueId
             };
+            ViewData["Status"] = new SelectList(Enum.GetValues(typeof(Models.TasksStatus)).Cast<Models.TasksStatus>());
             //ViewData["IssueId"] = _context.Issues.FirstOrDefault(i => i.Id == issueId);
             return View();
         }
@@ -78,12 +83,14 @@ namespace DeveloperProjectManagementTool.Controllers
                 return NotFound();
             }
 
-            var subTask = await _context.SubTasks.FindAsync(id);
+            var subTask = await _context.SubTasks
+
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (subTask == null)
             {
                 return NotFound();
             }
-            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", subTask.IssueId);
+            ViewData["Status"] = new SelectList(Enum.GetValues(typeof(Models.TasksStatus)).Cast<Models.TasksStatus>());
             return View(subTask);
         }
 

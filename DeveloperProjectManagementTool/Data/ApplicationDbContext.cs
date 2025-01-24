@@ -16,5 +16,8 @@ namespace DeveloperProjectManagementTool.Data
         public DbSet<SubTask> SubTasks { get; set; }
         public DbSet<ProjectHistory> ProjectHistories { get; set; }
         public DbSet<Models.Task> Tasks { get; set; } = default!;
+
+
+
     }
 }

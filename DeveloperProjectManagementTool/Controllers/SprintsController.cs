@@ -2,6 +2,7 @@
 using DeveloperProjectManagementTool.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeveloperProjectManagementTool.Controllers
@@ -30,6 +31,7 @@ namespace DeveloperProjectManagementTool.Controllers
             }
 
             var sprint = await _context.Sprints
+                .Include(s => s.Issues)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (sprint == null)
             {
@@ -40,9 +42,10 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
         // GET: Sprints/Create
+        [HttpGet]
         public IActionResult Create(int projectId)
         {
-            var projects = new Project
+            var projects = new Models.Project
             {
                 Id = projectId,
             };
@@ -165,67 +168,67 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
 
-        public async Task<IActionResult> ManageIssues(int sprintId)
-        {
-            var sprint = await _context.Sprints
-                .Include(s => s.Issues) // Include related issues
-                .FirstOrDefaultAsync(s => s.Id == sprintId);
+        //public async Task<IActionResult> ManageIssues(int id)
+        //{
+        //    var sprint = await _context.Sprints
+        //        .Include(s => s.Issues.Where(s.Id == s.ProjectId)) // Include issues assigned to the sprint
+        //        .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (sprint == null)
-            {
-                return NotFound();
-            }
+        //    if (sprint == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var availableIssues = await _context.Issues
-                .Where(i => i.SprintId == null) // Only show unassigned issues
-                .ToListAsync();
+        //    var projectIssues = await _context.Issues
+        //        .Where(i => i.ProjectId == sprint.ProjectId)
+        //        .ToListAsync();
 
-            var viewModel = new SprintIssuesViewModel
-            {
-                SprintId = sprint.Id,
-                SprintName = sprint.Name,
-                AvailableIssues = availableIssues,
-                SelectedIssueIds = sprint.Issues.Select(i => i.Id).ToList()
-            };
+        //    var model = new SprintIssuesViewModel
+        //    {
+        //        SprintId = sprint.Id,
+        //        //AvailableIssues = projectIssues,
+        //        SelectedIssueIds = sprint.Issues.Select(i => i.Id).ToList()
+        //    };
 
-            return View(viewModel);
-        }
+        //    return View(model);
+        //}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ManageIssues(SprintIssuesViewModel model)
-        {
-            var sprint = await _context.Sprints
-                .Include(s => s.Issues)
-                .FirstOrDefaultAsync(s => s.Id == model.SprintId);
 
-            if (sprint == null)
-            {
-                return NotFound();
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ManageIssues(SprintIssuesViewModel model)
+        //{
+        //    var sprint = await _context.Sprints
+        //        .Include(s => s.Issues)
+        //        .FirstOrDefaultAsync(s => s.Id == model.SprintId);
 
-            // Remove issues not selected
-            foreach (var issue in sprint.Issues.ToList())
-            {
-                if (!model.SelectedIssueIds.Contains(issue.Id))
-                {
-                    issue.SprintId = null; // Unassign the sprint
-                }
-            }
+        //    if (sprint == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            // Add selected issues
-            foreach (var issueId in model.SelectedIssueIds)
-            {
-                var issue = await _context.Issues.FindAsync(issueId);
-                if (issue != null && issue.SprintId != sprint.Id)
-                {
-                    issue.SprintId = sprint.Id; // Assign the sprint
-                }
-            }
+        //    // Remove issues not selected
+        //    foreach (var issue in sprint.Issues.ToList())
+        //    {
+        //        if (!model.SelectedIssueIds.Contains(issue.Id))
+        //        {
+        //            issue.SprintId = null; // Unassign the sprint
+        //        }
+        //    }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { id = sprint.Id });
-        }
+        //    // Add selected issues
+        //    foreach (var issueId in model.SelectedIssueIds)
+        //    {
+        //        var issue = await _context.Issues.FindAsync(issueId);
+        //        if (issue != null && issue.SprintId != sprint.Id)
+        //        {
+        //            issue.SprintId = sprint.Id; // Assign the sprint
+        //        }
+        //    }
+
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Details), new { id = sprint.Id });
+        //}
 
 
         private bool SprintExists(int id)

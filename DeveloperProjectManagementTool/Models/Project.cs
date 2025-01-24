@@ -16,7 +16,7 @@ namespace DeveloperProjectManagementTool.Models
 
         [ForeignKey("OwnerId")]
         public IdentityUser Owner { get; set; }
-        public List<Issue> Issues { get; set; } = new();
+
         public List<Sprint> Sprints { get; set; } = new();
         public List<ProjectHistory> History { get; set; } = new();
     }

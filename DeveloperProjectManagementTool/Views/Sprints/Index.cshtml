@@ -27,7 +27,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
-            <th></th>
+            <th>Add Issues</th>
         </tr>
     </thead>
     <tbody>
@@ -48,6 +48,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
+                <td>
+                    <a asp-action="ManageIssues" asp-route-sprintId="@item.Id" class="btn btn-secondary">Add Issues</a>
+                </td>
+                <td>
+                    <a asp-action="Create" asp-controller="Issues" asp-route-sprintId="@item.Id" class="btn btn-primary">
+                        Add Issue
+                    </a>
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

@@ -21,7 +21,13 @@
             <th>
                 @Html.DisplayNameFor(model => model.Owner)
             </th>
-            <th></th>
+            
+            <th>Add Sprints</th>
+            <th>
+                Workflow
+            </th>
+            
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +42,25 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Owner.UserName)
             </td>
+                
+                <td>
+                    <a asp-action="Create" asp-controller="Sprints" asp-route-projectId="@item.Id" class="btn btn-primary">
+                    Add Workflow
+                    </a>
+                </td>
+                <td>
+                    <ol>
+                        @foreach (var s in item.Sprints)
+                        {
+                            <li>
+                                <a asp-action ="Details" asp-route-id ="@s.Id" asp-controller="Sprints">@s.Name</a>
+                            </li>
+                        }
+                    </ol>
+                    
+                </td>
+            
+                
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

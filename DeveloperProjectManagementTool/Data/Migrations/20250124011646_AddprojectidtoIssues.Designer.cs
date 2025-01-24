@@ -4,6 +4,7 @@ using DeveloperProjectManagementTool.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeveloperProjectManagementTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250124011646_AddprojectidtoIssues")]
+    partial class AddprojectidtoIssues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,10 +47,16 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                     b.Property<int?>("Priority")
                         .HasColumnType("int");
 
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ReporterId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("SprintId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Summary")
@@ -58,6 +67,8 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
 
                     b.HasIndex("ReporterId");
 
@@ -173,9 +184,6 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("IssueId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -424,6 +432,12 @@ namespace DeveloperProjectManagementTool.Data.Migrations
 
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Issue", b =>
                 {
+                    b.HasOne("DeveloperProjectManagementTool.Models.Project", "Project")
+                        .WithMany("Issues")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Reporter")
                         .WithMany()
                         .HasForeignKey("ReporterId");
@@ -431,8 +445,10 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                     b.HasOne("DeveloperProjectManagementTool.Models.Sprint", "Sprint")
                         .WithMany("Issues")
                         .HasForeignKey("SprintId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Project");
 
                     b.Navigation("Reporter");
 
@@ -549,6 +565,8 @@ namespace DeveloperProjectManagementTool.Data.Migrations
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Project", b =>
                 {
                     b.Navigation("History");
+
+                    b.Navigation("Issues");
 
                     b.Navigation("Sprints");
                 });

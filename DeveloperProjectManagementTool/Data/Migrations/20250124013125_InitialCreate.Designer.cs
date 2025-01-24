@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeveloperProjectManagementTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250123070114_AddSprintIdToIssue")]
-    partial class AddSprintIdToIssue
+    [Migration("20250124013125_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,13 +47,10 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                     b.Property<int?>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ReporterId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("SprintId")
+                    b.Property<int>("SprintId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -67,8 +64,6 @@ namespace DeveloperProjectManagementTool.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
 
                     b.HasIndex("ReporterId");
 
@@ -432,21 +427,15 @@ namespace DeveloperProjectManagementTool.Data.Migrations
 
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Issue", b =>
                 {
-                    b.HasOne("DeveloperProjectManagementTool.Models.Project", "Project")
-                        .WithMany("Issues")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Reporter")
                         .WithMany()
                         .HasForeignKey("ReporterId");
 
                     b.HasOne("DeveloperProjectManagementTool.Models.Sprint", "Sprint")
                         .WithMany("Issues")
-                        .HasForeignKey("SprintId");
-
-                    b.Navigation("Project");
+                        .HasForeignKey("SprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Reporter");
 
@@ -563,8 +552,6 @@ namespace DeveloperProjectManagementTool.Data.Migrations
             modelBuilder.Entity("DeveloperProjectManagementTool.Models.Project", b =>
                 {
                     b.Navigation("History");
-
-                    b.Navigation("Issues");
 
                     b.Navigation("Sprints");
                 });

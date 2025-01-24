@@ -15,18 +15,15 @@ namespace DeveloperProjectManagementTool.Models
         public IdentityUser? Reporter { get; set; }
         public PriorityLevel? Priority { get; set; }
         public IssueType Type { get; set; }
-        public IssueStatus Status { get; set; } = IssueStatus.TODO;
+
         [Required]
-        public int ProjectId { get; set; }
-        [ForeignKey("ProjectId")]
-        public Project Project { get; set; }
-        public int? SprintId { get; set; }
+        public int SprintId { get; set; }
         [ForeignKey("SprintId")]
+
         public Sprint Sprint { get; set; }
         public List<SubTask> SubTask { get; set; } = new();
     }
 
     public enum PriorityLevel { Low, Medium, High }
     public enum IssueType { Epic, Task, Bug, Story }
-    public enum IssueStatus { TODO, InProgress, Done }
 }

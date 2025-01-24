@@ -14,6 +14,8 @@ namespace DeveloperProjectManagementTool.Models
         [Required]
         public int IssueId { get; set; }
         [ForeignKey("IssueId")]
-        public Issue Issue { get; set; }
+        public Issue? Issue { get; set; }
+        public TasksStatus Status { get; set; } = TasksStatus.TODO;
     }
+    public enum TasksStatus { TODO, InProgress, Done }
 }
