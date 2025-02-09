@@ -12,11 +12,11 @@ namespace DeveloperProjectManagementTool.Models
         public int DurationInDays { get; set; }
         [Required]
         public SprintStatus Status { get; set; } = SprintStatus.NotStarted;
-        public List<Issue> Issues { get; set; } = new();
+        public List<Issue>? Issues { get; set; } = new();
         [Required]
         public int ProjectId { get; set; }
         [ForeignKey("ProjectId")]
-        public Project Project { get; set; }
+        public Project? Project { get; set; }
 
         public void CalculateEndDate()
         {

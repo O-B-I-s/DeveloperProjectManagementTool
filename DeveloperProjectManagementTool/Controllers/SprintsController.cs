@@ -1,5 +1,6 @@
 ﻿using DeveloperProjectManagementTool.Data;
 using DeveloperProjectManagementTool.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
@@ -17,6 +18,7 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
         // GET: Sprints
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Sprints.ToListAsync());
@@ -79,7 +81,7 @@ namespace DeveloperProjectManagementTool.Controllers
                 Value = s.ToString(),
                 Text = s.ToString()
             }), "Value", "Text");
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id = sprint.Id });
             //return View(sprint);
         }
 
@@ -96,6 +98,13 @@ namespace DeveloperProjectManagementTool.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Status = new SelectList(Enum.GetValues(typeof(SprintStatus))
+           .Cast<SprintStatus>()
+           .Select(s => new SelectListItem
+           {
+               Value = s.ToString(),
+               Text = s.ToString()
+           }), "Value", "Text");
             return View(sprint);
         }
 
@@ -104,7 +113,7 @@ namespace DeveloperProjectManagementTool.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartDate,EndDate,DurationInDays,Status")] Sprint sprint)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartDate,EndDate,DurationInDays,Status, ProjectId")] Sprint sprint)
         {
             if (id != sprint.Id)
             {
@@ -118,19 +127,28 @@ namespace DeveloperProjectManagementTool.Controllers
                     _context.Update(sprint);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
                     if (!SprintExists(sprint.Id))
                     {
+
                         return NotFound();
                     }
                     else
                     {
+                        Console.WriteLine(ex.Message);
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = sprint.Id });
             }
+            ViewBag.Status = new SelectList(Enum.GetValues(typeof(SprintStatus))
+                    .Cast<SprintStatus>()
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.ToString(),
+                        Text = s.ToString()
+                    }), "Value", "Text");
             return View(sprint);
         }
 
@@ -161,74 +179,48 @@ namespace DeveloperProjectManagementTool.Controllers
             if (sprint != null)
             {
                 _context.Sprints.Remove(sprint);
-            }
+                await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(Details), new { id = sprint.Id });
         }
 
 
-        //public async Task<IActionResult> ManageIssues(int id)
-        //{
-        //    var sprint = await _context.Sprints
-        //        .Include(s => s.Issues.Where(s.Id == s.ProjectId)) // Include issues assigned to the sprint
-        //        .FirstOrDefaultAsync(s => s.Id == id);
 
-        //    if (sprint == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpGet]
+        public IActionResult GetSprintsByProject(int projectId)
+        {
+            var sprints = _context.Sprints
+                .Where(s => s.ProjectId == projectId)
+                .Include(s => s.Issues)
+                .ThenInclude(i => i.SubTask)
+                .Select(s => new
+                {
+                    organizationId = s.Project.Organization.Id,
+                    organizationName = s.Project.Organization.Name,
+                    id = s.Id,
+                    name = s.Name,
+                    status = s.Status,
+                    issueCount = s.Issues.Count(),
+                    tasks = s.Issues.SelectMany(i => i.SubTask).Count() // Flatten issues and count tasks
+                })
+                .AsEnumerable() // Switch to in-memory processing
+                .Select(s => new
+                {
+                    organizationId = s.organizationId,
+                    organizationName = s.organizationName,
+                    id = s.id,
+                    name = s.name,
+                    status = s.status,
+                    issueCount = s.issueCount,
+                    taskCount = s.tasks
+                })
+                .ToList();
 
-        //    var projectIssues = await _context.Issues
-        //        .Where(i => i.ProjectId == sprint.ProjectId)
-        //        .ToListAsync();
-
-        //    var model = new SprintIssuesViewModel
-        //    {
-        //        SprintId = sprint.Id,
-        //        //AvailableIssues = projectIssues,
-        //        SelectedIssueIds = sprint.Issues.Select(i => i.Id).ToList()
-        //    };
-
-        //    return View(model);
-        //}
+            return Json(sprints);
 
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ManageIssues(SprintIssuesViewModel model)
-        //{
-        //    var sprint = await _context.Sprints
-        //        .Include(s => s.Issues)
-        //        .FirstOrDefaultAsync(s => s.Id == model.SprintId);
-
-        //    if (sprint == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    // Remove issues not selected
-        //    foreach (var issue in sprint.Issues.ToList())
-        //    {
-        //        if (!model.SelectedIssueIds.Contains(issue.Id))
-        //        {
-        //            issue.SprintId = null; // Unassign the sprint
-        //        }
-        //    }
-
-        //    // Add selected issues
-        //    foreach (var issueId in model.SelectedIssueIds)
-        //    {
-        //        var issue = await _context.Issues.FindAsync(issueId);
-        //        if (issue != null && issue.SprintId != sprint.Id)
-        //        {
-        //            issue.SprintId = sprint.Id; // Assign the sprint
-        //        }
-        //    }
-
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Details), new { id = sprint.Id });
-        //}
+        }
 
 
         private bool SprintExists(int id)

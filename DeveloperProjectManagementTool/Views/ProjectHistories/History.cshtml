@@ -1,0 +1,23 @@
+﻿@model IEnumerable<DeveloperProjectManagementTool.ViewModels.ProjectHistoryViewModel>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>Details</th>
+            <th>User</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var history in Model)
+        {
+            <tr>
+                <td>@history.Action</td>
+                <td>@history.Details</td>
+                <td>@history.UserName</td>
+                <td>@history.Timestamp</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,5 +1,6 @@
 ﻿using DeveloperProjectManagementTool.Data;
 using DeveloperProjectManagementTool.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace DeveloperProjectManagementTool.Controllers
         }
 
         // GET: Issues
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Issues.Include(i => i.Reporter)
@@ -65,21 +67,20 @@ namespace DeveloperProjectManagementTool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Summary,Description,Attachment,ReporterId,Priority,Type,Status,SprintId")] Issue issue)
         {
-            //if (ModelState.IsValid)
-            //{
-            _context.Add(issue);
-            await _context.SaveChangesAsync();
-            //ViewData["SprintId"] = issue.SprintId;
+            if (ModelState.IsValid)
+            {
+                _context.Add(issue);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Details", "Sprints", new { id = issue.SprintId });
+            }
             ViewData["ReporterId"] = new SelectList(_context.Users, "Id", "Id", issue.ReporterId);
 
             ViewData["Type"] = new SelectList(Enum.GetValues(typeof(IssueType)).Cast<IssueType>());
             ViewData["Priority"] = new SelectList(Enum.GetValues(typeof(PriorityLevel)).Cast<PriorityLevel>());
-            //ViewData["SprintId"] = issue.SprintId;
-            return RedirectToAction(nameof(Index));
-            //return RedirectToAction("Index", "Issues", new { id = issue.SprintId });
-            //}
-
-            //return View(issue);
+            ViewData["SprintId"] = issue.SprintId;
+            // Redirect to the Details page of the sprint that the issue belongs to
+            return RedirectToAction("Details", "Sprints", new { id = issue.SprintId });
         }
 
         // GET: Issues/Edit/5
@@ -96,6 +97,9 @@ namespace DeveloperProjectManagementTool.Controllers
                 return NotFound();
             }
             ViewData["ReporterId"] = new SelectList(_context.Users, "Id", "Id", issue.ReporterId);
+            ViewData["Type"] = new SelectList(Enum.GetValues(typeof(IssueType)).Cast<IssueType>());
+            ViewData["Priority"] = new SelectList(Enum.GetValues(typeof(PriorityLevel)).Cast<PriorityLevel>());
+            ViewData["SprintId"] = issue.SprintId;
             return View(issue);
         }
 
@@ -104,7 +108,7 @@ namespace DeveloperProjectManagementTool.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Summary,Description,Attachment,ReporterId,Priority,Type,Status")] Issue issue)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Summary,Description,Attachment,ReporterId,Priority,Type,Status, SprintId")] Issue issue)
         {
             if (id != issue.Id)
             {
@@ -129,9 +133,13 @@ namespace DeveloperProjectManagementTool.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                // Redirect to the Details page of the sprint that the issue belongs to
+                return RedirectToAction("Details", "Sprints", new { id = issue.SprintId });
             }
             ViewData["ReporterId"] = new SelectList(_context.Users, "Id", "Id", issue.ReporterId);
+            ViewData["Type"] = new SelectList(Enum.GetValues(typeof(IssueType)).Cast<IssueType>());
+            ViewData["Priority"] = new SelectList(Enum.GetValues(typeof(PriorityLevel)).Cast<PriorityLevel>());
+            ViewData["SprintId"] = issue.SprintId;
             return View(issue);
         }
 
@@ -150,7 +158,9 @@ namespace DeveloperProjectManagementTool.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["Type"] = new SelectList(Enum.GetValues(typeof(IssueType)).Cast<IssueType>());
+            ViewData["Priority"] = new SelectList(Enum.GetValues(typeof(PriorityLevel)).Cast<PriorityLevel>());
+            ViewData["SprintId"] = issue.SprintId;
             return View(issue);
         }
 
@@ -166,7 +176,8 @@ namespace DeveloperProjectManagementTool.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            // Redirect to the Details page of the sprint that the issue belongs to
+            return RedirectToAction("Details", "Sprints", new { id = issue.SprintId });
         }
 
         private bool IssueExists(int id)

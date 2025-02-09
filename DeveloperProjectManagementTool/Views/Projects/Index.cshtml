@@ -1,72 +1,319 @@
-﻿@model IEnumerable<DeveloperProjectManagementTool.Models.Project>
+﻿ <!DOCTYPE html> 
+<html lang="en"> 
+ <head> 
+    @model IEnumerable<DeveloperProjectManagementTool.Models.Project>
 
-@{
-    ViewData["Title"] = "Index";
-}
 
-<h1>Index</h1>
+     
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Owner)
-            </th>
-            
-            <th>Add Sprints</th>
-            <th>
-                Workflow
-            </th>
-            
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Owner.UserName)
-            </td>
-                
-                <td>
-                    <a asp-action="Create" asp-controller="Sprints" asp-route-projectId="@item.Id" class="btn btn-primary">
-                    Add Workflow
-                    </a>
-                </td>
-                <td>
-                    <ol>
-                        @foreach (var s in item.Sprints)
-                        {
-                            <li>
-                                <a asp-action ="Details" asp-route-id ="@s.Id" asp-controller="Sprints">@s.Name</a>
-                            </li>
-                        }
-                    </ol>
-                    
-                </td>
-            
-                
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+ @*   @{  *@
+ @*        ViewData["Title"] = "Index";  *@
+ @*     }  *@
+ @*     <meta http-equiv="X-UA-Compatible" content="IE=edge" />  *@
+ @*     <title>Kaiadmin - Bootstrap 5 Admin Dashboard</title>  *@
+ @*     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no"  *@
+ @*           name="viewport" />  *@
+ @*     <link rel="icon"  *@
+ @*           href="~/assets/img/kaiadmin/favicon.ico"  *@
+ @*           type="image/x-icon" />  *@
+
+ @*     <!-- Fonts and icons -->  *@
+ @*     <script src="~/assets/js/plugin/webfont/webfont.min.js"></script>  *@
+ @*     <script>  *@
+ @*         WebFont.load({  *@
+ @*           google: { families: ["Public Sans:300,400,500,600,700"] },  *@
+ @*           custom: {  *@
+ @*             families: [  *@
+ @*               "Font Awesome 5 Solid",  *@
+ @*               "Font Awesome 5 Regular",  *@
+ @*               "Font Awesome 5 Brands",  *@
+ @*               "simple-line-icons",  *@
+ @*             ],  *@
+ @*             urls: ["/assets/css/fonts.min.css"],  *@
+ @*           },  *@
+ @*           active: function () {  *@
+ @*             sessionStorage.fonts = true;  *@
+ @*           },  *@
+ @*         });  *@
+ @*     </script>  *@
+
+ @*     <!-- CSS Files -->  *@
+ @*     <link rel="stylesheet" href="~/assets/css/bootstrap.min.css" />  *@
+ @*     <link rel="stylesheet" href="~/assets/css/plugins.min.css" />  *@
+ @*     <link rel="stylesheet" href="~/assets/css/kaiadmin.min.css" />  *@
+
+ @*     <!-- CSS Just for demo purpose, don't include it in your project -->  *@
+ @*     <link rel="stylesheet" href="~/assets/css/demo.css" />  *@
+ </head>  
+ <body>
+
+ 
+
+ @*     <h1>Index</h1>  *@
+
+ @*     <p>  *@
+ @*         <a asp-action="Create">Create New</a>  *@
+ @*     </p>  *@
+ @*     <table class="table">  *@
+ @*         <thead>  *@
+ @*             <tr>  *@
+ @*                 <th>  *@
+ @*                     @Html.DisplayNameFor(model => model.Name)  *@
+ @*                 </th>  *@
+ @*                 <th>  *@
+ @*                     @Html.DisplayNameFor(model => model.Description)  *@
+ @*                 </th>  *@
+ @*                 <th>  *@
+ @*                     @Html.DisplayNameFor(model => model.Owner)  *@
+ @*                 </th>  *@
+
+ @*                 <th>Add Sprints</th>  *@
+ @*                 <th>  *@
+ @*                     Workflow  *@
+ @*                 </th>  *@
+ @*                 <th>Organizations</th>  *@
+ @*                 <th>Actions</th>  *@
+
+ @*             </tr>  *@
+ @*         </thead>  *@
+ @*         <tbody>  *@
+ @*             @foreach (var item in Model)  *@
+ @*             {  *@
+ @*                 <tr>  *@
+ @*                     <td>  *@
+ @*                         @Html.DisplayFor(modelItem => item.Name)  *@
+ @*                     </td>  *@
+ @*                     <td>  *@
+ @*                         @Html.DisplayFor(modelItem => item.Description)  *@
+ @*                     </td>  *@
+ @*                     <td>  *@
+ @*                         @Html.DisplayFor(modelItem => item.Owner.UserName)  *@
+ @*                     </td>  *@
+
+ @*                     <td>  *@
+ @*                         <a asp-action="Create" asp-controller="Sprints" asp-route-projectId="@item.Id" class="btn btn-primary">  *@
+ @*                             Add Workflow  *@
+ @*                         </a>  *@
+ @*                     </td>  *@
+ @*                     <td>  *@
+ @*                         <ol>  *@
+ @*                             @foreach (var s in item.Sprints)  *@
+ @*                             {  *@
+ @*                                 <li>  *@
+ @*                                     <a asp-action="Details" asp-route-id="@s.Id" asp-controller="Sprints">@s.Name</a>  *@
+ @*                                 </li>  *@
+ @*                             }  *@
+ @*                         </ol>  *@
+
+ @*                     </td>  *@
+ @*                     <td>  *@
+ @*                         @item.Organization.Name  *@
+ @*                     </td>  *@
+
+
+ @*                     <td>  *@
+ @*                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |  *@
+ @*                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |  *@
+ @*                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>  *@
+ @*                         <a asp-action="History" asp-route-projectId="@item.Id" asp-controller="ProjectHistories">View History</a>  *@
+ @*                     </td>  *@
+ @*                 </tr>  *@
+ @*             }  *@
+ @*         </tbody>  *@
+ @*     </table>  *@
+
+
+
+
+     
+ <h1>Select a Project</h1>
+
+    <a asp-action="Create" class="btn btn-info">Create New</a>
+     <div class="form-group"> 
+         <label for="projectDropdown">Choose a Project:</label> 
+        <select id="projectDropdown" class="form-control">
+            @if (Model.Any())
+            {
+                var firstProject = Model.First();
+            <option value="@firstProject.Id" selected>@firstProject.Name</option>
+                @foreach (var item in Model.Skip(1)) // Skip the first item since it's already selected
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            }
+            else
+            {
+            <option value="">-- No Projects Available --</option>
+            }
+</select>
+
+     </div> 
+
+     <!-- Sprint Details Section --> 
+     <div id="sprintDetails" style="display: none;"> 
+         <h2>Sprint Details</h2> 
+         <table class="table"> 
+             <thead> 
+                 <tr> 
+                     <th>Sprint Name</th> 
+                     <th>Status</th> 
+                     <th>Number of Issues</th> 
+                     <th>Number of Tasks</th> 
+                     
+                     <th><div id="organizationInfo"></div>
+</th>
+                 </tr> 
+             </thead> 
+             <tbody id="sprintTableBody"></tbody> 
+         </table> 
+
+         <!-- Buttons --> 
+         
+         <button id="addSprint" class="btn btn-success">Add Sprint</button>
+        <div id="actionLinks">
+            <a id="editLink" asp-action="Edit" asp-route-id="@Model.FirstOrDefault()?.Id">Edit</a> |
+            <a id="detailsLink" asp-action="Details" asp-route-id="@Model.FirstOrDefault()?.Id">Details</a> |
+            <a id="deleteLink" asp-action="Delete" asp-route-id="@Model.FirstOrDefault()?.Id">Delete</a> |
+            <a id="historyLink" asp-action="History" asp-route-projectId="@Model.FirstOrDefault()?.Id" asp-controller="ProjectHistories">View History</a>
+        </div>
+
+        
+         
+     </div> 
+
+
+
+
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var firstProjectId = $("#projectDropdown option:selected").val();
+            if (firstProjectId) {
+                loadSprints(firstProjectId);
+            }
+
+            $("#projectDropdown").change(function () {
+                var projectId = $(this).val();
+                loadSprints(projectId);
+            });
+
+            $(document).on("click", ".delete-sprint", function () {
+                var sprintId = $(this).data("id");
+                if (confirm("Are you sure you want to delete this sprint?")) {
+                    deleteSprint(sprintId);
+                }
+            });
+        });
+
+        function loadSprints(projectId) {
+            if (!projectId) return;
+
+            $.ajax({
+                url: "/Sprints/GetSprintsByProject",
+                type: "GET",
+                data: { projectId: projectId },
+                success: function (data) {
+                    $("#sprintDetails").show();
+                    $("#sprintTableBody").empty();
+
+                    if (data.length > 0) {
+                        $("#organizationInfo").html(`
+                            <h3>Organization: ${data[0].organizationName} (ID: ${data[0].organizationId})</h3>
+                        `);
+                    }
+
+                    $.each(data, function (index, sprint) {
+                        $("#sprintTableBody").append(`
+                            <tr>
+                                <td><a href="/Sprints/Details/${sprint.id}" class="sprint-link">${sprint.name}</a></td>
+                                <td>${sprint.status}</td>
+                                <td>${sprint.issueCount}</td>
+                                <td>${sprint.taskCount}</td>
+                                <td>
+                                    <button class="btn btn-danger delete-sprint" data-id="${sprint.id}">Delete</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+            });
+        }
+
+        function deleteSprint(sprintId) {
+            $.ajax({
+                url: "/Sprints/DeleteConfirmed",
+                type: "POST",
+                data: { id: sprintId },
+                headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                success: function () {
+                    alert("Sprint deleted successfully!");
+                    location.reload(); // Refresh to update the sprint list
+                },
+                error: function () {
+                    alert("Error deleting sprint.");
+                }
+            });
+        }
+
+                // Update Buttons
+        $("#viewAllTasks").off("click").click(function () {
+            window.location.href = "/SubTasks/Index?projectId=" + projectId;
+        });
+
+                $("#addSprint").off("click").click(function () {
+            var projectId = $("#projectDropdown").val(); // Get selected project ID
+            if (!projectId) {
+                alert("Please select a project before adding a sprint.");
+                return;
+            }
+            window.location.href = "/Sprints/Create?projectId=" + projectId;
+        });
+
+
+        $("#viewAssignedTasks").off("click").click(function () {
+            window.location.href = "/SubTasks/AssignedTasks?projectId=" + projectId;
+        });
+
+                               $(document).ready(function () {
+            // Check if there is a stored project ID
+            var storedProjectId = localStorage.getItem("selectedProjectId");
+
+            if (storedProjectId) {
+                // Set the selected project in the dropdown if stored project ID exists
+                $("#projectDropdown").val(storedProjectId);
+                updateActionLinks(storedProjectId);  // Update action links based on the stored project ID
+            }
+
+            // When the project selection changes, update the links and store the selected project ID
+            $("#projectDropdown").change(function () {
+                var selectedProjectId = $(this).val();
+                updateActionLinks(selectedProjectId);
+
+                // Store the selected project ID in localStorage
+                localStorage.setItem("selectedProjectId", selectedProjectId);
+            });
+
+            // Function to update the action links dynamically
+            function updateActionLinks(projectId) {
+                if (projectId) {
+                    $("#editLink").attr("href", "/Projects/Edit/" + projectId);
+                    $("#detailsLink").attr("href", "/Projects/Details/" + projectId);
+                    $("#deleteLink").attr("href", "/Projects/Delete/" + projectId);
+                    $("#historyLink").attr("href", "/ProjectHistories/History/" + projectId);
+                }
+            }
+        });
+
+
+    </script>
+
+     </body> 
+     </html>
+
+
+
+
+
+
+

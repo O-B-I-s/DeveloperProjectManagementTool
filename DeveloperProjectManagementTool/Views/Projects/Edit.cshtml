@@ -1,37 +1,93 @@
 ﻿@model DeveloperProjectManagementTool.Models.Project
+@using Microsoft.AspNetCore.Identity
+
+@using DeveloperProjectManagementTool.Areas.Identity;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Edit";
+
+    // Get current user ID
+    var userId = UserManager.GetUserId(User);
+
+    // Check if the user is a Team Leader for this project
+    bool isTeamLeader = Model.UserRoles.Any(ur => ur.UserId == userId && ur.Role == "Team Leader");
 }
 
 <h1>Edit</h1>
-
 <h4>Project</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OwnerId" class="control-label"></label>
-                <select asp-for="OwnerId" class="form-control" asp-items="ViewBag.OwnerId"></select>
-                <span asp-validation-for="OwnerId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        @if (isTeamLeader || User.IsInRole("Admin"))
+        {
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OrganizationId" class="control-label"></label>
+                    <input asp-for="OrganizationId" class="form-control" readonly />
+                    <span asp-validation-for="OrganizationId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OwnerId" class="control-label"></label>
+                    <select asp-for="OwnerId" class="form-control" asp-items="ViewBag.OwnerId" disabled></select>
+                    <input type="hidden" asp-for="OwnerId" />
+                    <span asp-validation-for="OwnerId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        }
+        else
+        {
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" readonly />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OrganizationId" class="control-label"></label>
+                    <input asp-for="OrganizationId" class="form-control" readonly />
+                    <span asp-validation-for="OrganizationId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" readonly />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OwnerId" class="control-label"></label>
+                    <select asp-for="OwnerId" class="form-control" asp-items="ViewBag.OwnerId" disabled></select>
+                    <span asp-validation-for="OwnerId" class="text-danger"></span>
+                </div>
+            </form>
+        }
     </div>
 </div>
 
@@ -40,5 +96,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

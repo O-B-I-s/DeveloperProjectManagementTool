@@ -1,8 +1,8 @@
 ﻿@model DeveloperProjectManagementTool.Models.SubTask
 
-@{
-    ViewData["Title"] = "Edit";
-}
+@* @{ *@
+@*     ViewData["Title"] = "Edit"; *@
+@* } *@
 
 <h1>Edit</h1>
 
@@ -14,6 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="IssueId" />
+            <input type="hidden" asp-for="AssignedUserId">
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -24,6 +25,9 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
+          
+
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsCompleted" /> @Html.DisplayNameFor(model => model.IsCompleted)

@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Join Organization";
+}
+
+<h2>Join an Organization</h2>
+
+<form asp-action="JoinOrganization" method="post">
+    <div class="form-group">
+        <label for="organizationId">Enter Organization ID</label>
+        <input type="number" name="organizationId" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Join</button>
+</form>

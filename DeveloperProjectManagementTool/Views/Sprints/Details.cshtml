@@ -1,93 +1,95 @@
-﻿@model  DeveloperProjectManagementTool.Models.Sprint
+﻿@model DeveloperProjectManagementTool.Models.Sprint
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Sprint Details";
 }
 
-<h1>Details</h1>
-<a asp-action="Create" asp-controller="Issues" asp-route-sprintId="@Model.Id" class="btn btn-primary">
-    Add Issue
-</a>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="text-primary">Sprint Details</h1>
+        <a asp-action="Create" asp-controller="Issues" asp-route-sprintId="@Model.Id" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Issue
+        </a>
+    </div>
 
-<div>
-    <h4>Sprint</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StartDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EndDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EndDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DurationInDays)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DurationInDays)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="card shadow-sm p-4 mb-4">
+        <h4 class="text-secondary">Sprint Information</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3 fw-bold">Sprint Name</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
 
+            <dt class="col-sm-3 fw-bold">Start Date</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartDate)</dd>
 
+            <dt class="col-sm-3 fw-bold">End Date</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndDate)</dd>
 
+            <dt class="col-sm-3 fw-bold">Duration (Days)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.DurationInDays)</dd>
 
-<h3>Issues</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Issue Name</th>
-            <th>Summary</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.Issues != null && Model.Issues.Any())
-        {
-            foreach (var issue in Model.Issues)
-            {
+            <dt class="col-sm-3 fw-bold">Status</dt>
+            <dd class="col-sm-9">
+                <span class="badge bg-info text-dark">@Html.DisplayFor(model => model.Status)</span>
+            </dd>
+        </dl>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit Sprint
+        </a>
+        <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">Delete</a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Sprints
+        </a>
+    </div>
+
+    <hr class="my-4" />
+
+    <h3 class="text-secondary">Issues</h3>
+    <div class="card shadow-sm p-4">
+        <table class="table table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => issue.Name)</td>
-                    <td>@Html.DisplayFor(modelItem => issue.Summary)</td>
-                    <td>
-                        <a asp-action="Create" asp-controller="SubTasks" asp-route-IssueId="@issue.Id" class="btn btn-primary">
-                            Create A Task
-                        </a>
-                    </td>
-                    <td>
-                        <a asp-action="Index" asp-controller="SubTasks" asp-route-id="@issue.Id" class="btn btn-primary">
-                            View Tasks
-                        </a>
-                    </td>
+                    <th>Issue Name</th>
+                    <th>Summary</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="3">No issues available for this sprint.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @if (Model.Issues != null && Model.Issues.Any())
+                {
+                    @foreach (var issue in Model.Issues)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => issue.Name)</td>
+                            <td>@Html.DisplayFor(modelItem => issue.Summary)</td>
+                            <td>
+                                <a asp-action="Create" asp-controller="SubTasks" asp-route-IssueId="@issue.Id" class="btn btn-success btn-sm">
+                                    <i class="bi bi-plus-circle"></i> Create Task
+                                </a>
+                                <a asp-action="Index" asp-controller="SubTasks" asp-route-id="@issue.Id" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-list-task"></i> View Tasks
+                                </a>
+                                <a asp-action="AssignedTasks" asp-controller="SubTasks" asp-route-id="@issue.Id" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-person-check"></i> View Assigned Tasks
+                                </a>
+                                <a asp-action="Edit" asp-controller="Issues" asp-route-id="@issue.Id" class="btn btn-outline-dark btn-sm">Edit</a> |
+                                <a asp-action="Details" asp-controller="Issues" asp-route-id="@issue.Id" class="btn btn-outline-dark btn-sm">Details</a> |
+                                <a asp-action="Delete" asp-controller="Issues" asp-route-id="@issue.Id" class="btn btn-outline-dark btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No issues available for this sprint.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

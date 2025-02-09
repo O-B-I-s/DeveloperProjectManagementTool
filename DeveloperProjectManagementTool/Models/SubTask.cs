@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DeveloperProjectManagementTool.Areas.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DeveloperProjectManagementTool.Models
@@ -15,6 +16,9 @@ namespace DeveloperProjectManagementTool.Models
         public int IssueId { get; set; }
         [ForeignKey("IssueId")]
         public Issue? Issue { get; set; }
+
+        public string? AssignedUserId { get; set; }
+        public ApplicationUser? AssignedUser { get; set; }
         public TasksStatus Status { get; set; } = TasksStatus.TODO;
     }
     public enum TasksStatus { TODO, InProgress, Done }

@@ -20,8 +20,8 @@ namespace DeveloperProjectManagementTool.Models
         public int SprintId { get; set; }
         [ForeignKey("SprintId")]
 
-        public Sprint Sprint { get; set; }
-        public List<SubTask> SubTask { get; set; } = new();
+        public Sprint? Sprint { get; set; }
+        public List<SubTask>? SubTask { get; set; } = new();
     }
 
     public enum PriorityLevel { Low, Medium, High }

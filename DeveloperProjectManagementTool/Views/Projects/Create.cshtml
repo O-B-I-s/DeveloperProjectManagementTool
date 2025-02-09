@@ -27,6 +27,11 @@
                 <select asp-for="OwnerId" class="form-control" asp-items="ViewBag.OwnerId">
                     <option value="">-- Select Owner --</option>
                 </select>
+                <div class="form-group">
+                    <label asp-for="OrganizationId" class="control-label">Organization</label>
+                    <select asp-for="OrganizationId" class="form-control" asp-items="ViewBag.OrganizationId"></select>
+                    <span asp-validation-for="OrganizationId" class="text-danger"></span>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

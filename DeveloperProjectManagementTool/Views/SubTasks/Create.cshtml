@@ -23,15 +23,21 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsCompleted" /> @Html.DisplayNameFor(model => model.IsCompleted)
-                </label>
+            <div class="form-group">
+                <label asp-for="AssignedUserId" class="control-label"></label>
+                <select asp-for="AssignedUserId" class="form-control" asp-items="ViewBag.AssignedUserId"></select>
+                <span asp-validation-for="AssignedUserId" class="text-danger"></span>
             </div>
+            
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
                 <select asp-for="Status" class="form-control" asp-items="ViewBag.Status"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsCompleted" /> @Html.DisplayNameFor(model => model.IsCompleted)
+                </label>
             </div>
             @* <div class="form-group"> *@
             @*     <label asp-for="IssueId" class="control-label"></label> *@
