@@ -124,63 +124,66 @@
  @*     </table>  *@
 
 
+    <div class="container">
+        <h1>Select a Project</h1>
 
-
-     
- <h1>Select a Project</h1>
-
-    <a asp-action="Create" class="btn btn-info">Create New</a>
-     <div class="form-group"> 
-         <label for="projectDropdown">Choose a Project:</label> 
-        <select id="projectDropdown" class="form-control">
-            @if (Model.Any())
-            {
-                var firstProject = Model.First();
-            <option value="@firstProject.Id" selected>@firstProject.Name</option>
-                @foreach (var item in Model.Skip(1)) // Skip the first item since it's already selected
+        <a asp-action="Create" class="btn btn-info">Create New</a>
+        <div class="form-group">
+            <label for="projectDropdown">Choose a Project:</label>
+            <select id="projectDropdown" class="form-control">
+                @if (Model.Any())
                 {
-                    <option value="@item.Id">@item.Name</option>
+                    var firstProject = Model.First();
+                    <option value="@firstProject.Id" selected>@firstProject.Name</option>
+                    @foreach (var item in Model.Skip(1)) // Skip the first item since it's already selected
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
                 }
-            }
-            else
-            {
-            <option value="">-- No Projects Available --</option>
-            }
-</select>
+                else
+                {
+                    <option value="">-- No Projects Available --</option>
+                }
+            </select>
 
-     </div> 
-
-     <!-- Sprint Details Section --> 
-     <div id="sprintDetails" style="display: none;"> 
-         <h2>Sprint Details</h2> 
-         <table class="table"> 
-             <thead> 
-                 <tr> 
-                     <th>Sprint Name</th> 
-                     <th>Status</th> 
-                     <th>Number of Issues</th> 
-                     <th>Number of Tasks</th> 
-                     
-                     <th><div id="organizationInfo"></div>
-</th>
-                 </tr> 
-             </thead> 
-             <tbody id="sprintTableBody"></tbody> 
-         </table> 
-
-         <!-- Buttons --> 
-         
-         <button id="addSprint" class="btn btn-success">Add Sprint</button>
-        <div id="actionLinks">
-            <a id="editLink" asp-action="Edit" asp-route-id="@Model.FirstOrDefault()?.Id">Edit</a> |
-            <a id="detailsLink" asp-action="Details" asp-route-id="@Model.FirstOrDefault()?.Id">Details</a> |
-            <a id="deleteLink" asp-action="Delete" asp-route-id="@Model.FirstOrDefault()?.Id">Delete</a> |
-            <a id="historyLink" asp-action="History" asp-route-projectId="@Model.FirstOrDefault()?.Id" asp-controller="ProjectHistories">View History</a>
         </div>
 
-        
-         
-     </div> 
+        <!-- Sprint Details Section -->
+        <div id="sprintDetails" style="display: none;">
+            <h2>Sprint Details</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sprint Name</th>
+                        <th>Status</th>
+                        <th>Number of Issues</th>
+                        <th>Number of Tasks</th>
+
+                        <th>
+                            <div id="organizationInfo"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="sprintTableBody"></tbody>
+            </table>
+
+            <!-- Buttons -->
+
+            <button id="addSprint" class="btn btn-success">Add Sprint</button>
+            <div id="actionLinks">
+                <a id="editLink" asp-action="Edit" asp-route-id="@Model.FirstOrDefault()?.Id">Edit</a> |
+                <a id="detailsLink" asp-action="Details" asp-route-id="@Model.FirstOrDefault()?.Id">Details</a> |
+                <a id="deleteLink" asp-action="Delete" asp-route-id="@Model.FirstOrDefault()?.Id">Delete</a> |
+                <a id="historyLink" asp-action="History" asp-route-projectId="@Model.FirstOrDefault()?.Id">View History</a>
+            </div>
+
+
+
+        </div>
+    </div>
+
+     
+ 
 
 
 
@@ -217,11 +220,14 @@
                     $("#sprintDetails").show();
                     $("#sprintTableBody").empty();
 
-                    if (data.length > 0) {
-                        $("#organizationInfo").html(`
-                            <h3>Organization: ${data[0].organizationName} (ID: ${data[0].organizationId})</h3>
-                        `);
-                    }
+                            if (data.length > 0 && data[0].organizationName) {
+            $("#organizationInfo").html(`
+                <h3>Organization: ${data[0].organizationName} (ID: ${data[0].organizationId})</h3>
+            `);
+        } else {
+            $("#organizationInfo").html(`<h3>Organization: Not Assigned</h3>`);
+        }
+
 
                     $.each(data, function (index, sprint) {
                         $("#sprintTableBody").append(`
@@ -300,7 +306,7 @@
                     $("#editLink").attr("href", "/Projects/Edit/" + projectId);
                     $("#detailsLink").attr("href", "/Projects/Details/" + projectId);
                     $("#deleteLink").attr("href", "/Projects/Delete/" + projectId);
-                    $("#historyLink").attr("href", "/ProjectHistories/History/" + projectId);
+                    $("#historyLink").attr("href", "/ProjectHistories/History?projectId=" + projectId);
                 }
             }
         });

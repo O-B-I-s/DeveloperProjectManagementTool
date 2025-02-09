@@ -18,6 +18,12 @@ namespace DeveloperProjectManagementTool.Controllers
 
         public async Task<IActionResult> History(int projectId)
         {
+            Console.WriteLine("History action hit!");
+            if (projectId == null)
+            {
+                Console.WriteLine("Error: projectId is null");
+                return BadRequest("Project ID is required.");
+            }
             var history = await _context.ProjectHistories
                 .Where(h => h.ProjectId == projectId)
                 .Include(h => h.User)
@@ -29,7 +35,7 @@ namespace DeveloperProjectManagementTool.Controllers
                     Timestamp = h.Timestamp
                 })
                 .ToListAsync();
-            Console.WriteLine($"History Count: {history.Count}");
+            Console.WriteLine($"History Count: {history.Count}, project ID: {projectId}");
             return View(history);
         }
 

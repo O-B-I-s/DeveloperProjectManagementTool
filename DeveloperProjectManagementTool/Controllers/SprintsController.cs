@@ -68,12 +68,12 @@ namespace DeveloperProjectManagementTool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,StartDate,EndDate,DurationInDays,Status,ProjectId")] Sprint sprint)
         {
-            //if (ModelState.IsValid)
-            //{
-            _context.Add(sprint);
-            await _context.SaveChangesAsync();
-
-            //}
+            if (ModelState.IsValid)
+            {
+                _context.Add(sprint);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Details), new { id = sprint.Id });
+            }
             ViewBag.Status = new SelectList(Enum.GetValues(typeof(SprintStatus))
             .Cast<SprintStatus>()
             .Select(s => new SelectListItem
@@ -81,8 +81,8 @@ namespace DeveloperProjectManagementTool.Controllers
                 Value = s.ToString(),
                 Text = s.ToString()
             }), "Value", "Text");
-            return RedirectToAction(nameof(Details), new { id = sprint.Id });
-            //return View(sprint);
+
+            return View(sprint);
         }
 
         // GET: Sprints/Edit/5
@@ -192,6 +192,8 @@ namespace DeveloperProjectManagementTool.Controllers
         {
             var sprints = _context.Sprints
                 .Where(s => s.ProjectId == projectId)
+                .Include(s => s.Project)
+                .ThenInclude(p => p.Organization)
                 .Include(s => s.Issues)
                 .ThenInclude(i => i.SubTask)
                 .Select(s => new

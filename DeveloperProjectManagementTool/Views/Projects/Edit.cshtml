@@ -26,6 +26,7 @@
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for =" @Model.UserRoles" />
 
                 <div class="form-group">
                     <label asp-for="Name" class="control-label"></label>

@@ -75,13 +75,29 @@ namespace DeveloperProjectManagementTool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Organization organization)
         {
-            //if (ModelState.IsValid)
-            //{
-            _context.Add(organization);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-            //}
-            //return View(organization);
+            if (ModelState.IsValid)
+            {
+                _context.Add(organization);
+                await _context.SaveChangesAsync();
+
+
+                // Get the logged-in user
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    // Add user to organization
+                    var userOrganization = new UserOrganization
+                    {
+                        UserId = user.Id,
+                        OrganizationId = organization.Id
+                    };
+
+                    _context.UserOrganizations.Add(userOrganization);
+                    await _context.SaveChangesAsync(); // Save the membership
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(organization);
         }
 
         // GET: Organizations/Edit/5

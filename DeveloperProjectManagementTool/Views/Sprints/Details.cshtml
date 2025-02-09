@@ -78,6 +78,7 @@
                                 <a asp-action="Edit" asp-controller="Issues" asp-route-id="@issue.Id" class="btn btn-outline-dark btn-sm">Edit</a> |
                                 <a asp-action="Details" asp-controller="Issues" asp-route-id="@issue.Id" class="btn btn-outline-dark btn-sm">Details</a> |
                                 <a asp-action="Delete" asp-controller="Issues" asp-route-id="@issue.Id" class="btn btn-outline-dark btn-sm">Delete</a>
+                                <a asp-action="History" asp-route-issueId="@issue.Id" asp-controller="ProjectHistories">View History</a>
                             </td>
                         </tr>
                     }

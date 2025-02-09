@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -111,10 +112,15 @@ namespace DeveloperProjectManagementTool.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,OwnerId,OrganizationId")] Project project)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,OwnerId,OrganizationId")] Models.Project project)
         {
+
+
             if (ModelState.IsValid)
             {
+
+
+
                 // If the OwnerId is not set (which it shouldn't be), set it to the logged-in user
                 if (project.OwnerId == null)
                 {
@@ -127,7 +133,7 @@ namespace DeveloperProjectManagementTool.Controllers
                 if (organization == null)
                 {
                     ModelState.AddModelError("", "Invalid organization selected.");
-                    ViewData["OrganizationId"] = new SelectList(_context.Organizations, "Id", "Name", project.OrganizationId);
+
                     return View(project);
                 }
 
@@ -140,6 +146,13 @@ namespace DeveloperProjectManagementTool.Controllers
 
                 _context.Add(project);
                 await _context.SaveChangesAsync();
+                // Log history
+                await _historyLogger.LogHistory(
+                    "Created",
+                    $"Project '{project.Name}' was Created.",
+                    projectId: project.Id
+                );
+
 
                 // Assign Team Leader role to the creator
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get logged-in user ID
@@ -152,8 +165,25 @@ namespace DeveloperProjectManagementTool.Controllers
                 _context.Add(projectUserRole);
                 await _context.SaveChangesAsync();
 
+
                 return RedirectToAction(nameof(Index));
             }
+            var userID = _userManager.GetUserId(User); // Get logged-in user's ID
+
+            // Get the organizations the user belongs to
+            var userOrganizationIds = await _context.UserOrganizations
+                .Where(uo => uo.UserId == userID)
+                .Select(uo => uo.OrganizationId)
+                .ToListAsync();
+
+            // Fetch the organizations the user belongs to
+            var organizations = await _context.Organizations
+                .Where(o => userOrganizationIds.Contains(o.Id))
+                .ToListAsync();
+            var currentUser = await _userManager.GetUserAsync(User);
+            ViewData["OrganizationId"] = new SelectList(organizations, "Id", "Name");
+
+            ViewData["OwnerId"] = new SelectList(new[] { currentUser }, "Id", "UserName");
             return View(project);
         }
 
@@ -168,60 +198,71 @@ namespace DeveloperProjectManagementTool.Controllers
             }
 
             var project = await _context.Projects
-                .Include(p => p.UserRoles)
+                .Include(p => p.UserRoles)  // Ensure UserRoles is included
                 .FirstOrDefaultAsync(p => p.Id == id);
+
             if (project == null)
             {
                 return NotFound();
             }
-            ViewData["OrganizationId"] = new SelectList(_context.Organizations, "Id", "Name");
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.Owner);
+
+            // Ensure UserRoles is not null
+            project.UserRoles ??= new List<ProjectUserRole>();
+
+            ViewData["OrganizationId"] = new SelectList(_context.Organizations, "Id", "Name", project.OrganizationId);
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", project.OwnerId);
+
             return View(project);
         }
+
 
         // POST: Projects/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,OwnerId,OrganizationId")] Project project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,OwnerId,OrganizationId")] Models.Project project)
         {
             if (id != project.Id)
             {
                 return NotFound();
             }
 
-            //if (ModelState.IsValid)
-            //{
-            try
+            if (ModelState.IsValid)
             {
-                _context.Update(project);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Update(project);
+                    await _context.SaveChangesAsync();
 
-                // Log history
-                await _historyLogger.LogHistory(
-                    "Updated",
-                    $"Project '{project.Name}' was updated.",
-                    projectId: project.Id
-                );
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProjectExists(project.Id))
-                {
-                    return NotFound();
+
+
+                    // Log history
+                    await _historyLogger.LogHistory(
+                        "Updated",
+                        $"Project '{project.Name}' was updated.",
+                        projectId: project.Id
+                    );
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!ProjectExists(project.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
+                ViewData["OrganizationId"] = new SelectList(_context.Organizations, "Id", "Name");
+                ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.Owner);
+                return RedirectToAction(nameof(Index));
             }
+
             ViewData["OrganizationId"] = new SelectList(_context.Organizations, "Id", "Name");
             ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", project.Owner);
-            return RedirectToAction(nameof(Index));
-            //}
-
-            //return View(project);
+            return View(project);
         }
 
         // GET: Projects/Delete/5

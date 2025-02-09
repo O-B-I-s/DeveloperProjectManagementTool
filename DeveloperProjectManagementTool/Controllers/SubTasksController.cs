@@ -123,15 +123,15 @@ namespace DeveloperProjectManagementTool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,IsCompleted,IssueId, AssignedUserId")] SubTask subTask)
         {
-            //if (ModelState.IsValid)
-            //{
-            _context.Add(subTask);
-            await _context.SaveChangesAsync();
-            //ViewData["IssueId"] = subTask.IssueId;
-            return RedirectToAction(nameof(AssignedTasks), new { id = subTask.IssueId });
-            //}
-            //ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", subTask.IssueId);
-            //return View(subTask);
+            if (ModelState.IsValid)
+            {
+                _context.Add(subTask);
+                await _context.SaveChangesAsync();
+                //ViewData["IssueId"] = subTask.IssueId;
+                return RedirectToAction(nameof(AssignedTasks), new { id = subTask.IssueId });
+            }
+            ViewData["IssueId"] = new SelectList(_context.Issues, "Id", "Id", subTask.IssueId);
+            return View(subTask);
         }
 
         // GET: SubTasks/Edit/5

@@ -10,10 +10,14 @@ namespace DeveloperProjectManagementTool.Controllers
     public class IssuesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly HistoryLoggerService _historyLogger;
 
-        public IssuesController(ApplicationDbContext context)
+
+        public IssuesController(ApplicationDbContext context, HistoryLoggerService historyLogger)
         {
             _context = context;
+            _historyLogger = historyLogger;
+
         }
 
         // GET: Issues
@@ -71,6 +75,12 @@ namespace DeveloperProjectManagementTool.Controllers
             {
                 _context.Add(issue);
                 await _context.SaveChangesAsync();
+                // Log history
+                await _historyLogger.LogHistory(
+                    "Created",
+                    $"Project '{issue.Name}' was Created.",
+                    projectId: issue.Id
+                );
 
                 return RedirectToAction("Details", "Sprints", new { id = issue.SprintId });
             }
@@ -121,6 +131,13 @@ namespace DeveloperProjectManagementTool.Controllers
                 {
                     _context.Update(issue);
                     await _context.SaveChangesAsync();
+                    await _historyLogger.LogHistory(
+                          "Edited",
+                          $"Issue '{issue.Name}' was updated.",
+                          sprintId: issue.SprintId,
+                          issueId: issue.Id
+  );
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
